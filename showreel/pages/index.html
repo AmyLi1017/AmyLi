@@ -25,6 +25,7 @@
                     <span class="progressTime">00:00</span>
                     <div class="progress">
                         <div class="progress-bar-wrapper">
+                            <div class="buffer-bar"></div>
                             <div class="progress-bar">
                                 <span class="endOfBar"></span>
                             </div>
@@ -49,6 +50,7 @@
         video.autoplay = true;
         starTime();//开始计时
         starProgress();//开启进度条
+        starBuffer();//开启缓冲进度条
     });
 
     //播放
@@ -124,12 +126,23 @@
     $(".progress").on("click",function (e) {
         var changeProgressWidth = e.pageX - $(this).offset().left;
         var perPos = changeProgressWidth/($(this).width());
-        var currentTime = (video.duration)*perPos;
-        video.currentTime = currentTime;
-        console.log(video.currentTime);
+        video.currentTime = (video.duration)*perPos;
         starTime();
         starProgress();
-    })
+    });
+
+    //缓冲进度条
+    function starBuffer() {
+        var intBuffer = setInterval(function () {
+            var bufferEnd = video.buffered.end(0) || 0;
+            var duration = video.duration;
+            var bufferedWidth = (bufferEnd/duration)*100;
+            $(".buffer-bar").width(bufferedWidth + "%");
+            if (bufferEnd >= duration){
+                clearInterval(intBuffer);
+            }
+        },1000)
+    }
 
 </script>
 </html>
