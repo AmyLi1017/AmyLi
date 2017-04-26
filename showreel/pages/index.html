@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>video player</title>
+    <link rel="stylesheet" href="./css/iconfont/iconfont.css">
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+<body>
+<div class="index-wrapper">
+    <div class="main">
+        <video class="play-view">
+            <source src="./source/变形金刚.mp4" type="video/mp4">
+        </video>
+        <div class="control-wrapper">
+            <div class="title">
+                <p>AXE EFFECT</p>
+                <p>EVEN ANGELS WILL FALL</p>
+            </div>
+            <div class="control">
+                <div class="play-control">
+                    <i class="i icon-prev"></i><i class="i icon-pause"></i><i class="i icon-play hide"></i><i class="i icon-next"></i>
+                </div>
+                <div class="middle">
+                    <span class="progressTime">00:00</span>
+                    <div class="progress">
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar">
+                                <span class="endOfBar"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="other-control">
+                    <i class="i icon-vol"></i><i class="i icon-fullScreen"></i><i class="i icon-autoScreen hide"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../js/jquery-3.1.0.min.js"></script>
+<script>
+    var video = $(".play-view")[0];
+    var duration = video.duration;
+    var currentSrc = video.currentSrc;
+
+    $(document).ready(function () {
+        video.autoplay = true;
+        starTime();//开始计时
+        starProgress();//开启进度条
+    });
+
+    //播放
+    $(".icon-play").on("click",function () {
+        $(this).addClass("hide");
+        $(this).siblings().removeClass("hide");
+
+        video.play();
+        starTime();
+        starProgress();
+    });
+
+    //暂停
+    $(".icon-pause").on("click",function () {
+        $(this).addClass("hide");
+        $(this).siblings().removeClass("hide");
+
+        video.pause();
+        //暂停计时
+        pauseTime();
+        pauseProgress();
+    });
+
+    //已播放时间
+    var minute = 0;
+    var second = 0;
+    var int;
+    var intProgress;
+    function starTime() {
+        window.clearInterval(int);
+        int = setInterval(timer,1000)
+    }
+    function timer() {
+        var currentTime = video.currentTime;
+        var second = Math.round(currentTime)%60;
+        var minute = parseInt(Math.floor(currentTime)/60);
+        var secondStr = second;
+        var minuteStr = minute;
+        if(second < 10){
+            secondStr = "0" + second;
+        }
+        if(minute < 10){
+            minuteStr = "0" + minute;
+        }
+
+        $(".progressTime").text(minuteStr + ":" + secondStr);
+    }
+    function pauseTime() {
+        window.clearInterval(int);
+    }
+    function resetTime() {
+        window.clearInterval(int);
+        minute = second = 0;
+        $(".progressTime").text("00:00")
+    }
+
+    //进度条
+    function starProgress() {
+        window.clearInterval(intProgress);
+        intProgress = setInterval(progress,1000)
+    }
+    function progress() {
+        var currentTime = video.currentTime;
+        duration = video.duration;
+        var width = (currentTime/duration)*100;
+        $(".progress-bar").css("width",width + "%");
+    }
+    function pauseProgress() {
+        window.clearInterval(intProgress);
+    }
+    
+    //点击进度条
+    $(".progress").on("click",function (e) {
+        var changeProgressWidth = e.pageX - $(this).offset().left;
+        var perPos = changeProgressWidth/($(this).width());
+        var currentTime = (video.duration)*perPos;
+        video.currentTime = currentTime;
+        console.log(video.currentTime);
+        starTime();
+        starProgress();
+    })
+
+</script>
+</html>
